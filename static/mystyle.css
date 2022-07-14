@@ -4,6 +4,8 @@ body {
   /* text-align: center; */
   position: relative;
   z-index: 1;
+  font-family: 'Dongle', sans-serif;
+  font-family: 'Jua', sans-serif;
 }
 body::after {
   width: 100vw;
