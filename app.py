@@ -197,7 +197,47 @@ def update_like():
 
 @app.route('/detail_input')
 def detail_input():
-    return render_template('detail_input.html')
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.users.find_one({"username": payload["id"]})
+        return render_template('detail_input.html', user_info=user_info)
+    except jwt.ExpiredSignatureError:
+        return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+    except jwt.exceptions.DecodeError:
+        return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
+
+@app.route('/input', methods=['GET'])
+def show_diary():
+    diaries = list(db.diary.find({}, {'_id': False}))
+    return jsonify({'all_diary': diaries})
+
+@app.route('/input', methods=['POST'])
+def save_diary():
+    title_receive = request.form['title_give']
+    content_receive = request.form['content_give']
+
+    file = request.files["file_give"]
+
+    extension = file.filename.split('.')[-1]
+
+    today = datetime.now()
+    mytime = today.strftime("%Y-%m-%d-%H-%M-%S")
+
+    filename = f'file-{mytime}'
+
+    save_to = f'static/{filename}.{extension}'
+    file.save(save_to)
+
+    doc = {
+        'title':title_receive,
+        'content': content_receive,
+        'file': f'{filename}.{extension}',
+        'time': today.strftime('%Y.%m.%d')
+    }
+    db.diary.insert_one(doc)
+    return jsonify({'msg': '저장 완료!'})
+
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5300, debug=True)

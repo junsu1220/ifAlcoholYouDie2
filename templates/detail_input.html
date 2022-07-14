@@ -17,6 +17,12 @@
       crossorigin="anonymous"
     />
 
+        <!-- Bulma CSS -->
+        <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css"
+      />
+
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -42,13 +48,17 @@
       rel="stylesheet"
     />
     <style>
-      * {
+      /* * {
         font-family: "Jua", sans-serif;
+      } */
+      .section {
+        padding: 1rem 1.5rem;
+        max-width: 750px;
+        margin: auto;
       }
       section.main {
         width: 1000px;
         height: 760px;
-        background-color: orange;
         margin: auto;
         padding-top: 120px;
       }
@@ -71,11 +81,19 @@
         height: 300px;
         border: 3px solid black;
       }
+      .imagePreview{
+        width: 300px;
+        height: 300px;
+        border: 3px solid black;
+        background-position: center center;
+        background-size: auto; 
+        background-repeat: no-repeat;
+        display: inline-block;
+      }
       .posting-box > .custom-file {
         margin-bottom: 20px;
       }
       .logo {
-        margin-top: 15px;
         border: 3px solid black;
         width: 900px;
         margin: auto;
@@ -88,6 +106,65 @@
       .logo:hover {
         background-color: rgb(202, 14, 14);
       }
+      .navbar-end {
+        display: flex;
+        flex-direction: row;
+        justify-content: right;
+        align-items: center;
+      }
+
+      .container > button {
+        width: 200px;
+        height: 50px;
+
+        background-color: transparent;
+        color: black;
+
+        border-radius: 50px;
+        border: 1px solid black;
+
+        margin-top: 10px;
+      }
+
+      .is-sparta {
+  color: #e8344e !important;
+}
+
+.button.is-sparta {
+  background-color: #e8344e;
+  border-color: transparent;
+  color: #fff !important;
+}
+
+.button.is-sparta.is-outlined {
+  background-color: transparent;
+  border-color: #e8344e;
+  color: #e8344e !important;
+}
+
+      .container > button:hover {
+        border: 2px solid rgb(212, 49, 49);
+      }
+
+      body {
+        width: 100vw;
+        height: 100vh;
+        /* text-align: center; */
+        position: relative;
+        z-index: 1;
+      }
+      body::after {
+        width: 100%;
+        height: 100%;
+        content: "";
+        background-image: url("https://pbs.twimg.com/media/Ez9br3nVEAMf9ei.jpg:large");
+        background-size: cover;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        opacity: 0.5;
+      }
     </style>
     <script>
       $(document).ready(function () {
@@ -98,8 +175,6 @@
         let content = $("#content").val();
 
         let file = $("#file")[0].files[0];
-        let test = $("#file");
-        console.log(test);
         let form_data = new FormData();
 
         form_data.append("file_give", file);
@@ -115,13 +190,51 @@
           processData: false,
           success: function (response) {
             alert(response["msg"]);
-            // window.location.reload();
+            window.location.href = "/"
           },
         });
       }
+
+      $(function() {
+        $("#file").on("change", function(){
+          var files = !!this.files ? this.files : [];
+          if (!files.length || !window.FileReader) return;
+          if (/^image/.test( files[0].type)){
+            var reader = new FileReader();
+            reader.readAsDataURL(files[0]);
+            reader.onloadend = function(){
+            $('.imagePreview').css("background-image", "url("+this.result+")");
+            };
+          }
+        });
+      });
     </script>
   </head>
-  <body>
+  <body class="has-navbar-fixed-top">
+    <nav
+      class="navbar is-fixed-top is-white"
+      role="navigation"
+      aria-label="main navigation"
+    >
+      <div class="navbar-brand">
+        <a class="navbar-item" href="/" style="position: absolute; left: 0px">
+          <img src="{{ url_for('static', filename='cock.png') }}" />
+          <strong
+            class="is-sparta"
+            style="font-family: 'Stylish', sans-serif; font-size: larger"
+            >ifDrinkYouDie</strong
+          >
+        </a>
+        <div><i class="fa-regular fa-square-plus fa-3x"></i></div> 
+        <div class="navbar-item" style="position: absolute; right: 0px">
+          <div class="buttons" >
+            <a class="button is-primary" href="/user/{{ user_info.username }}">마이페이지 </a>
+            <a class="button is-warning" onclick='window.location.href = "/detail_input";'>사진올리기</i></a>
+            <a class="button is-danger" onclick="sign_out()">로그아웃 </a>
+          </div>
+        </div>
+      </div>
+    </nav>
     <section class="main">
       <div class="logo" onclick="window.location.href='/'">
         오빠, 술이야 나야?
@@ -132,7 +245,7 @@
       <div class="wrap">
         <div class="jumbotron jumbotron-fluid">
           <div class="container">
-            <div class="pic">pic</div>
+            <div class="imagePreview"></div>
             <div class="posting-box">
               <div class="custom-file">
                 <input type="file" class="custom-file-input" id="file" />

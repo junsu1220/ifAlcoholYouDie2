@@ -7,12 +7,12 @@ body {
 }
 body::after {
   width: 100vw;
-  height: 100vh;
+  height: 100%;
 
   content: "";
   background-image: url("https://pbs.twimg.com/media/Ez9br3nVEAMf9ei.jpg:large");
   background-size: cover;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   z-index: -1;
